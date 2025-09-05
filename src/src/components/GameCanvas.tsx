@@ -1,12 +1,47 @@
 import { useEffect, useRef, useCallback } from "react";
 import { CanvasRenderer } from "../renderers/canvas";
-import { useGameState, useGameActions } from "../state/store";
+import { 
+  useMobs, 
+  useTowers, 
+  useProjectiles, 
+  useGrid, 
+  useSelectedTile, 
+  useBuildingTower,
+  useSelectedTower,
+  usePaused,
+  useGameOver,
+  useVictory,
+  useSelectTile,
+  useBuildTower,
+  useSelectTower,
+  useCancelBuilding,
+  useResume,
+  usePause,
+  useRestart,
+  useStartBuilding
+} from "../state/zustandStore";
 
 export function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
-  const state = useGameState();
-  const actions = useGameActions();
+  const mobs = useMobs();
+  const towers = useTowers();
+  const projectiles = useProjectiles();
+  const grid = useGrid();
+  const selectedTile = useSelectedTile();
+  const buildingTower = useBuildingTower();
+  const selectedTower = useSelectedTower();
+  const paused = usePaused();
+  const gameOver = useGameOver();
+  const victory = useVictory();
+  const selectTile = useSelectTile();
+  const buildTower = useBuildTower();
+  const selectTower = useSelectTower();
+  const cancelBuilding = useCancelBuilding();
+  const resume = useResume();
+  const pause = usePause();
+  const restart = useRestart();
+  const startBuilding = useStartBuilding();
 
   // Initialize renderer
   useEffect(() => {
@@ -21,14 +56,22 @@ export function GameCanvas() {
   // Render game state
   useEffect(() => {
     if (rendererRef.current) {
-      rendererRef.current.render(state);
+      rendererRef.current.render({
+        mobs,
+        towers,
+        projectiles,
+        grid,
+        selectedTile,
+        buildingTower,
+        selectedTower,
+      } as any);
     }
-  }, [state]);
+  }, [mobs, towers, projectiles, grid, selectedTile, buildingTower, selectedTower]);
 
   // Handle mouse movement for building preview
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!rendererRef.current || !state.buildingTower) return;
+      if (!rendererRef.current || !buildingTower) return;
 
       const rect = canvasRef.current!.getBoundingClientRect();
       const screenPos = {
@@ -42,17 +85,17 @@ export function GameCanvas() {
       // Check bounds
       if (
         gridPos.x < 0 ||
-        gridPos.x >= state.grid.width ||
+        gridPos.x >= grid.width ||
         gridPos.y < 0 ||
-        gridPos.y >= state.grid.height
+        gridPos.y >= grid.height
       ) {
         return;
       }
 
       // Update selected tile for preview
-      actions.selectTile(gridPos);
+      selectTile(gridPos);
     },
-    [state.buildingTower, state.grid.width, state.grid.height, actions],
+    [buildingTower, grid.width, grid.height, selectTile],
   );
 
   // Handle canvas clicks
@@ -73,36 +116,37 @@ export function GameCanvas() {
       // Check bounds
       if (
         gridPos.x < 0 ||
-        gridPos.x >= state.grid.width ||
+        gridPos.x >= grid.width ||
         gridPos.y < 0 ||
-        gridPos.y >= state.grid.height
+        gridPos.y >= grid.height
       ) {
         return;
       }
 
       // If building a tower, try to place it
-      if (state.buildingTower) {
-        actions.buildTower(gridPos);
+      if (buildingTower) {
+        buildTower(gridPos);
         return;
       }
 
       // Check if clicking on an existing tower
-      const tower = state.towers.find(
+      const tower = towers.find(
         (t) => t.tile.x === gridPos.x && t.tile.y === gridPos.y,
       );
 
       if (tower) {
-        actions.selectTower(tower.id);
+        selectTower(tower.id);
       } else {
-        actions.selectTile(gridPos);
+        selectTile(gridPos);
       }
     },
     [
-      state.buildingTower,
-      state.grid.width,
-      state.grid.height,
-      state.towers,
-      actions,
+      buildingTower,
+      grid.width,
+      grid.height,
+      towers,
+      buildTower,
+      selectTower,
     ],
   );
 
@@ -110,11 +154,11 @@ export function GameCanvas() {
   const handleRightClick = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
       event.preventDefault();
-      if (state.buildingTower) {
-        actions.cancelBuilding();
+      if (buildingTower) {
+        cancelBuilding();
       }
     },
-    [state.buildingTower, actions],
+    [buildingTower, cancelBuilding],
   );
 
   // Keyboard controls
@@ -123,37 +167,37 @@ export function GameCanvas() {
       switch (event.code) {
         case "Space":
           event.preventDefault();
-          if (state.paused) {
-            actions.resume();
+          if (paused) {
+            resume();
           } else {
-            actions.pause();
+            pause();
           }
           break;
         case "Escape":
           event.preventDefault();
-          if (state.buildingTower) {
-            actions.cancelBuilding();
-          } else if (state.selectedTower) {
-            actions.selectTower(null);
+          if (buildingTower) {
+            cancelBuilding();
+          } else if (selectedTower) {
+            selectTower(null);
           }
           break;
         case "KeyR":
           event.preventDefault();
-          if (state.gameOver) {
-            actions.restart();
+          if (gameOver) {
+            restart();
           }
           break;
         case "Digit1":
           event.preventDefault();
-          actions.startBuilding("arrow");
+          startBuilding("arrow");
           break;
         case "Digit2":
           event.preventDefault();
-          actions.startBuilding("cannon");
+          startBuilding("cannon");
           break;
         case "Digit3":
           event.preventDefault();
-          actions.startBuilding("frost");
+          startBuilding("frost");
           break;
       }
     };
@@ -162,11 +206,16 @@ export function GameCanvas() {
     return () =>
       window.removeEventListener("keydown", handleKeyDown);
   }, [
-    state.paused,
-    state.buildingTower,
-    state.selectedTower,
-    state.gameOver,
-    actions,
+    paused,
+    buildingTower,
+    selectedTower,
+    gameOver,
+    resume,
+    pause,
+    cancelBuilding,
+    selectTower,
+    restart,
+    startBuilding,
   ]);
 
   return (
@@ -183,7 +232,7 @@ export function GameCanvas() {
       />
 
       {/* Game overlays */}
-      {state.paused && !state.gameOver && (
+      {paused && !gameOver && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-card p-6 rounded-lg border border-border">
             <h2>Game Paused</h2>
@@ -194,19 +243,19 @@ export function GameCanvas() {
         </div>
       )}
 
-      {state.gameOver && (
+      {gameOver && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-card p-6 rounded-lg border border-border text-center">
             <h2 className="mb-4">
-              {state.victory ? "🎉 Victory!" : "💀 Game Over"}
+              {victory ? "🎉 Victory!" : "💀 Game Over"}
             </h2>
             <p className="text-muted-foreground mb-4">
-              {state.victory
+              {victory
                 ? "You successfully defended against all waves!"
                 : "Your defenses have been overwhelmed!"}
             </p>
             <button
-              onClick={actions.restart}
+              onClick={restart}
               className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
             >
               Play Again (R)
@@ -216,10 +265,10 @@ export function GameCanvas() {
       )}
 
       {/* Building hint */}
-      {state.buildingTower && (
+      {buildingTower && (
         <div className="absolute top-2 left-2 bg-card p-2 rounded border border-border">
           <p className="text-sm">
-            Building {state.buildingTower} tower - Click to
+            Building {buildingTower} tower - Click to
             place, Right-click to cancel
           </p>
         </div>

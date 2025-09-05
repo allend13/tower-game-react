@@ -1,5 +1,5 @@
 import { Trash2, TrendingUp } from 'lucide-react';
-import { useGameState, useGameActions } from '../state/store';
+import { useGameState, useGameActions } from '../state/_store';
 import { TOWER_STATS, TOWER_ICONS } from '../engine/types';
 import { canUpgradeTower } from '../engine/sim';
 

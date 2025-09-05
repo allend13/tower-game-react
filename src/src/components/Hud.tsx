@@ -1,5 +1,5 @@
 import { Play, Pause, RotateCcw, Zap, Heart, DollarSign, Shield } from 'lucide-react';
-import { useGameState, useGameActions } from '../state/store';
+import { useGameState, useGameActions } from '../state/_store';
 import { WAVES } from '../engine/types';
 
 export function Hud() {

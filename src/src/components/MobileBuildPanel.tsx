@@ -1,4 +1,9 @@
-import { useGameState, useGameActions } from '../state/store';
+import { 
+  useGameMoney, 
+  useBuildingTower, 
+  useGameOver,
+  useStartBuilding
+} from '../state/zustandStore';
 import { TowerKind, TOWER_STATS, TOWER_ICONS } from '../engine/types';
 
 const towerConfig = {
@@ -23,13 +28,15 @@ const towerConfig = {
 };
 
 export function MobileBuildPanel() {
-  const state = useGameState();
-  const actions = useGameActions();
+  const money = useGameMoney();
+  const buildingTower = useBuildingTower();
+  const gameOver = useGameOver();
+  const startBuilding = useStartBuilding();
 
   const handleTowerSelect = (type: TowerKind) => {
     const stats = TOWER_STATS[type][0];
-    if (state.money >= stats.cost) {
-      actions.startBuilding(type);
+    if (money >= stats.cost) {
+      startBuilding(type);
     }
   };
 
@@ -40,15 +47,15 @@ export function MobileBuildPanel() {
         {Object.entries(towerConfig).map(([type, config]) => {
           const towerType = type as TowerKind;
           const stats = TOWER_STATS[towerType][0];
-          const canAfford = state.money >= stats.cost;
-          const isSelected = state.buildingTower === towerType;
+          const canAfford = money >= stats.cost;
+          const isSelected = buildingTower === towerType;
           const icon = TOWER_ICONS[towerType];
           
           return (
             <button
               key={type}
               onClick={() => handleTowerSelect(towerType)}
-              disabled={!canAfford || state.gameOver}
+              disabled={!canAfford || gameOver}
               className={`
                 flex-1 p-3 rounded-lg border-2 transition-all duration-200
                 ${isSelected 
@@ -100,7 +107,7 @@ export function MobileBuildPanel() {
         })}
       </div>
       
-      {state.buildingTower && (
+      {buildingTower && (
         <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
           <p className="text-sm text-primary text-center">
             Tap on the game field to place your tower

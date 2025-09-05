@@ -1,22 +1,34 @@
 import { TrendingUp, Trash2, X } from 'lucide-react';
-import { useGameState, useGameActions } from '../state/store';
+import { 
+  useSelectedTower, 
+  useTowers, 
+  useGameMoney, 
+  useGameOver,
+  useSelectTower,
+  useUpgradeTower,
+  useSellTower
+} from '../state/zustandStore';
 import { TOWER_STATS, TOWER_ICONS } from '../engine/types';
-import { canUpgradeTower } from '../engine/sim';
 import { gridToWorld } from '../engine/grid';
 import { useEffect, useRef, useState } from 'react';
 
 export function TowerModal() {
-  const state = useGameState();
-  const actions = useGameActions();
+  const selectedTowerId = useSelectedTower();
+  const towers = useTowers();
+  const money = useGameMoney();
+  const gameOver = useGameOver();
+  const selectTower = useSelectTower();
+  const upgradeTower = useUpgradeTower();
+  const sellTower = useSellTower();
   const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const selectedTower = state.selectedTower 
-    ? state.towers.find(t => t.id === state.selectedTower)
+  const selectedTower = selectedTowerId 
+    ? towers.find(t => t.id === selectedTowerId)
     : null;
 
   const handleClose = () => {
-    actions.selectTower(null);
+    selectTower(null);
   };
 
   // Get canvas position for tower modal positioning
@@ -62,7 +74,7 @@ export function TowerModal() {
 
   const currentStats = TOWER_STATS[selectedTower.kind][selectedTower.tier - 1];
   const nextStats = selectedTower.tier < 3 ? TOWER_STATS[selectedTower.kind][selectedTower.tier] : null;
-  const canUpgrade = canUpgradeTower(state, selectedTower.id);
+  const canUpgrade = selectedTower && selectedTower.tier < 3 && money >= TOWER_STATS[selectedTower.kind][selectedTower.tier].cost;
   const icon = TOWER_ICONS[selectedTower.kind];
 
   // Calculate total investment
@@ -127,10 +139,10 @@ export function TowerModal() {
         {nextStats && (
           <button
             onClick={() => {
-              actions.upgradeTower(selectedTower.id);
+              upgradeTower(selectedTower.id);
               handleClose();
             }}
-            disabled={!canUpgrade || state.gameOver}
+            disabled={!canUpgrade || gameOver}
             className={`w-full flex items-center px-2 py-1.5 rounded text-xs transition-colors ${
               canUpgrade
                 ? 'bg-green-600 hover:bg-green-700 text-white'
@@ -151,10 +163,10 @@ export function TowerModal() {
 
         <button
           onClick={() => {
-            actions.sellTower(selectedTower.id);
+            sellTower(selectedTower.id);
             handleClose();
           }}
-          disabled={state.gameOver}
+          disabled={gameOver}
           className="w-full flex items-center px-2 py-1.5 bg-slate-700 hover:bg-slate-600 text-red-400 rounded text-xs transition-colors disabled:opacity-50"
         >
           <Trash2 className="w-3 h-3 mr-2" />

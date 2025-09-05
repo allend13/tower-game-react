@@ -1,57 +1,64 @@
 import { Timer } from 'lucide-react';
-import { useGameStateWithTime } from '../state/store';
+import { 
+  useCurrentWave, 
+  useCanStartWave, 
+  useWaveInProgress,
+  useGameOver,
+  useVictory,
+  useGameTime,
+  useWaveCompleted,
+  useWaveStartTime,
+  useWaveCompletedTime
+} from '../state/zustandStore';
 import { WAVES } from '../engine/types';
-import { GAME_CONFIG } from '../constants';
 
 export function WaveBar() {
-  const state = useGameStateWithTime();
+  const currentWave = useCurrentWave();
+  const canStartWave = useCanStartWave();
+  const waveInProgress = useWaveInProgress();
+  const gameOver = useGameOver();
+  const victory = useVictory();
+  const time = useGameTime();
+  const waveCompleted = useWaveCompleted();
+  const waveStartTime = useWaveStartTime();
+  const waveCompletedTime = useWaveCompletedTime();
   
   // Add safety checks for undefined state
-  if (!state || state.currentWave === undefined) {
+  if (currentWave === undefined) {
     return null;
   }
   
-  
-  const currentWave = WAVES[state.currentWave - 1];
-  const waveInProgress = state.mobs.length > 0 || (state.waveStartTime && !state.waveCompleted);
-  const canStartWave = state.waveCompleted && !state.gameOver && state.currentWave < GAME_CONFIG.TOTAL_WAVES;
+  const currentWaveData = WAVES[currentWave - 1];
 
-  // Calculate countdown timer for next wave or current wave progress
-  const getWaveProgress = () => {
-    if (canStartWave && state.waveCompletedTime) {
-      // Show countdown to auto-start next wave (30 seconds)
-      const autoStartDelay = GAME_CONFIG.WAVE_AUTO_START_DELAY; // 30 seconds
-      const timeSinceCompleted = state.time - state.waveCompletedTime;
-      const remainingTime = Math.max(0, autoStartDelay - timeSinceCompleted);
-      const progress = ((autoStartDelay - remainingTime) / autoStartDelay) * 100;
-      
-      return { progress, remainingTime, isCountdown: true };
+  // Calculate wave progress locally to avoid object recreation
+  const waveProgress = (() => {
+    if (waveCompleted && waveCompletedTime) {
+      const timeSinceCompleted = time - waveCompletedTime;
+      const remainingTime = Math.max(0, 5 - timeSinceCompleted); // 5 seconds delay
+      return { progress: 100, remainingTime, isCountdown: true };
     }
     
-    if (!state.waveStartTime) return null;
+    if (!waveStartTime) return null;
     
-    // Show progress of current wave (10 seconds duration)
-    const waveTime = state.time - state.waveStartTime;
-    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION;
+    const waveTime = time - waveStartTime;
+    const WAVE_DURATION = 10; // 10 seconds duration
     const remainingTime = Math.max(0, WAVE_DURATION - waveTime);
     const progress = ((WAVE_DURATION - remainingTime) / WAVE_DURATION) * 100;
     
     return { progress, remainingTime, isCountdown: false };
-  };
-
-  const waveProgress = getWaveProgress();
+  })();
 
   const getStatusText = () => {
-    if (state.victory) return 'Victory!';
-    if (state.gameOver && !state.victory) return 'Game Over';
+    if (victory) return 'Victory!';
+    if (gameOver && !victory) return 'Game Over';
     if (canStartWave) return 'Waiting for next wave';
     if (waveInProgress) return 'In progress';
     return 'Starting...';
   };
 
   const getStatusColor = () => {
-    if (state.gameOver && !state.victory) return 'text-red-500';
-    if (state.victory) return 'text-green-400';
+    if (gameOver && !victory) return 'text-red-500';
+    if (victory) return 'text-green-400';
     if (waveInProgress) return 'text-green-400';
     if (canStartWave) return 'text-green-400';
     return 'text-muted-foreground';
@@ -65,7 +72,7 @@ export function WaveBar() {
           {/* Left - Wave number and status */}
           <div className="flex items-center gap-3">
             <span className="font-medium text-foreground">
-              Wave {state.currentWave}/10
+              Wave {currentWave}/10
             </span>
             <span className={`text-sm ${getStatusColor()}`}>
               {getStatusText()}
@@ -102,9 +109,9 @@ export function WaveBar() {
         </div>
 
         {/* Optional: Show current wave reward on mobile when not in progress */}
-        {currentWave && !waveInProgress && (
+        {currentWaveData && !waveInProgress && (
           <div className="mt-2 text-sm text-muted-foreground">
-            Reward: ${currentWave.reward} • Mobs: {currentWave.entries?.reduce((total, entry) => total + entry.count, 0) || 0}
+            Reward: ${currentWaveData.reward} • Mobs: {currentWaveData.entries?.reduce((total, entry) => total + entry.count, 0) || 0}
           </div>
         )}
       </div>
@@ -116,7 +123,7 @@ export function WaveBar() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
               <span className="text-lg font-medium text-foreground text-[15px]">
-                Wave {state.currentWave} of 10
+                Wave {currentWave} of 10
               </span>
               <div className="w-px h-6 bg-border"></div>
               <span className={`text-sm font-medium ${getStatusColor()}`}>
@@ -157,11 +164,11 @@ export function WaveBar() {
               </>
             )}
             
-            {currentWave && (
+            {currentWaveData && (
               <>
                 <div className="w-px h-6 bg-border"></div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Reward: ${currentWave.reward || 0}</span>
+                  <span>Reward: ${currentWaveData.reward || 0}</span>
                 </div>
               </>
             )}
@@ -169,7 +176,7 @@ export function WaveBar() {
 
           {/* Right side - Actions */}
           <div className="flex items-center gap-3">
-            {state.gameOver && !state.victory && (
+            {gameOver && !victory && (
               <span className="text-sm text-muted-foreground">
                 Click restart to try again
               </span>

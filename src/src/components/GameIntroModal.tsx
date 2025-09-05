@@ -1,18 +1,18 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { Button } from '../../components/ui/button';
-import { useGameState, useGameActions } from '../state/store';
+import { useGameStarted, useStartGame } from '../state/zustandStore';
 import { Target } from 'lucide-react';
 
 export function GameIntroModal() {
-  const state = useGameState();
-  const actions = useGameActions();
+  const gameStarted = useGameStarted();
+  const startGame = useStartGame();
 
   const handleStartGame = () => {
-    actions.startGame();
+    startGame();
   };
 
   return (
-    <Dialog open={!state.gameStarted} onOpenChange={() => {}}>
+    <Dialog open={!gameStarted} onOpenChange={() => {}}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">

@@ -1,4 +1,4 @@
-import { GameProvider } from './src/state/store';
+import { GameInitializer } from './src/components/GameInitializer';
 import { GameCanvas } from './src/components/GameCanvas';
 import { TopBar } from './src/components/TopBar';
 import { WaveBar } from './src/components/WaveBar';
@@ -10,8 +10,8 @@ import { GameIntroModal } from './src/components/GameIntroModal';
 
 export default function App() {
   return (
-    <GameProvider>
-      <div className="h-screen bg-background dark flex flex-col">
+    <div className="h-screen bg-background dark flex flex-col">
+      <GameInitializer />
         {/* Top Bar */}
         <TopBar />
         
@@ -59,6 +59,5 @@ export default function App() {
         <GameIntroModal />
         <TowerModal />
       </div>
-    </GameProvider>
   );
 }
