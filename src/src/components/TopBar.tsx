@@ -1,26 +1,21 @@
 import { DollarSign, Heart, Play, Pause, RotateCcw } from 'lucide-react';
-import { 
-  useGameMoney, 
-  useGameLives, 
-  usePaused, 
-  useSpeed, 
-  useGameOver, 
-  usePause,
-  useResume,
-  useSetSpeed,
-  useRestart
-} from '../state/zustandStore';
+import { useShallow } from 'zustand/react/shallow';
+import { useGameStore } from '../state/zustandStore';
 
 export function TopBar() {
-  const money = useGameMoney();
-  const lives = useGameLives();
-  const paused = usePaused();
-  const speed = useSpeed();
-  const gameOver = useGameOver();
-  const pause = usePause();
-  const resume = useResume();
-  const setSpeed = useSetSpeed();
-  const restart = useRestart();
+  const { money, lives, paused, speed, gameOver, pause, resume, setSpeed, restart } = useGameStore(
+    useShallow(state => ({
+      money: state.money,
+      lives: state.lives,
+      paused: state.paused,
+      speed: state.speed,
+      gameOver: state.gameOver,
+      pause: state.pause,
+      resume: state.resume,
+      setSpeed: state.setSpeed,
+      restart: state.restart
+    }))
+  );
 
   return (
     <div className="bg-card border-b border-border px-4 sm:px-6 py-3 sm:py-4">

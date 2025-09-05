@@ -1,3 +1,5 @@
+
+import { memo } from 'react';
 import { GameInitializer } from './src/components/GameInitializer';
 import { GameCanvas } from './src/components/GameCanvas';
 import { TopBar } from './src/components/TopBar';
@@ -8,10 +10,11 @@ import { MobileTabs } from './src/components/MobileTabs';
 import { TowerModal } from './src/components/TowerModal';
 import { GameIntroModal } from './src/components/GameIntroModal';
 
-export default function App() {
+const App = memo(function App() {
   return (
     <div className="h-screen bg-background dark flex flex-col">
-      <GameInitializer />
+        <GameInitializer />
+        
         {/* Top Bar */}
         <TopBar />
         
@@ -60,4 +63,6 @@ export default function App() {
         <TowerModal />
       </div>
   );
-}
+});
+
+export default App;

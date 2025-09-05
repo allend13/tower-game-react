@@ -1,13 +1,18 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '../state/zustandStore';
 import { GAME_CONFIG } from '../constants';
 
 export function GameInitializer() {
-  const gameStarted = useGameStore(state => state.gameStarted);
-  const paused = useGameStore(state => state.paused);
-  const gameOver = useGameStore(state => state.gameOver);
-  const speed = useGameStore(state => state.speed);
-  const tick = useGameStore(state => state.tick);
+  const { gameStarted, paused, gameOver, speed, tick } = useGameStore(
+    useShallow(state => ({
+      gameStarted: state.gameStarted,
+      paused: state.paused,
+      gameOver: state.gameOver,
+      speed: state.speed,
+      tick: state.tick
+    }))
+  );
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastTimeRef = useRef<number>(0);
 

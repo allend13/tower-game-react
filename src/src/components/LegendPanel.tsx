@@ -1,7 +1,5 @@
 
-import { memo } from 'react';
-
-export const LegendPanel = memo(function LegendPanel() {
+export function LegendPanel() {
   return (
     <div className="bg-card rounded-lg border border-border p-3 lg:p-4 h-full mt-[0px] mr-[0px] mb-[8px] ml-[0px]">
       <h3 className="mb-2 lg:mb-3 text-base lg:text-[20px]">Enemy types</h3>
@@ -129,4 +127,4 @@ export const LegendPanel = memo(function LegendPanel() {
       </div>
     </div>
   );
-});
+}

@@ -1,27 +1,32 @@
 import { Timer } from 'lucide-react';
-import { 
-  useCurrentWave, 
-  useCanStartWave, 
-  useWaveInProgress,
-  useGameOver,
-  useVictory,
-  useGameTime,
-  useWaveCompleted,
-  useWaveStartTime,
-  useWaveCompletedTime
-} from '../state/zustandStore';
+import { useShallow } from 'zustand/react/shallow';
+import { useGameStore } from '../state/zustandStore';
 import { WAVES } from '../engine/types';
 
 export function WaveBar() {
-  const currentWave = useCurrentWave();
-  const canStartWave = useCanStartWave();
-  const waveInProgress = useWaveInProgress();
-  const gameOver = useGameOver();
-  const victory = useVictory();
-  const time = useGameTime();
-  const waveCompleted = useWaveCompleted();
-  const waveStartTime = useWaveStartTime();
-  const waveCompletedTime = useWaveCompletedTime();
+  const { 
+    currentWave, 
+    waveCompleted, 
+    gameOver, 
+    victory, 
+    time, 
+    waveStartTime, 
+    waveCompletedTime 
+  } = useGameStore(
+    useShallow(state => ({
+      currentWave: state.currentWave,
+      waveCompleted: state.waveCompleted,
+      gameOver: state.gameOver,
+      victory: state.victory,
+      time: state.time,
+      waveStartTime: state.waveStartTime,
+      waveCompletedTime: state.waveCompletedTime
+    }))
+  );
+  
+  // Calculate derived state
+  const canStartWave = !waveCompleted && !gameOver && !victory;
+  const waveInProgress = !waveCompleted && !gameOver && !victory;
   
   // Add safety checks for undefined state
   if (currentWave === undefined) {
