@@ -1,6 +1,7 @@
 import { GameState, Mob, Projectile, Vec2, TOWER_STATS, MOB_STATS, WAVES } from './types';
 import { findTarget, predictMobPosition } from './targeting';
 import { getPathWorldPositions } from './grid';
+import { GAME_CONFIG } from '../constants';
 
 let nextId = 0;
 function generateId(): string {
@@ -13,7 +14,7 @@ function distance(a: Vec2, b: Vec2): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function normalize(v: Vec2): Vec2 {
+function normalize(v: Vec2): Vec2 { 
   const len = Math.sqrt(v.x * v.x + v.y * v.y);
   if (len === 0) return { x: 0, y: 0 };
   return { x: v.x / len, y: v.y / len };
@@ -29,9 +30,9 @@ function updateMobs(game: GameState, deltaTime: number, tileSize: number): GameS
     // Apply slow effects
     let currentSpeed = newMob.baseSpeed;
     if (newMob.slowUntil && game.time < newMob.slowUntil) {
-      currentSpeed *= 0.4; // 60% speed reduction when slowed
+      currentSpeed *= GAME_CONFIG.MOB_SLOW_FACTOR; // 60% speed reduction when slowed
     }
-    newMob.speed = Math.max(currentSpeed, newMob.baseSpeed * 0.3); // Minimum 30% speed
+    newMob.speed = Math.max(currentSpeed, newMob.baseSpeed * GAME_CONFIG.MOB_MIN_SPEED_FACTOR); // Minimum 30% speed
 
     // Move along path
     if (newMob.pathIndex < pathPositions.length - 1) {
@@ -337,7 +338,7 @@ export function advanceTick(game: GameState, deltaTime: number, tileSize: number
   // Auto-start next wave after 30 seconds
   if (newGame.waveCompleted && newGame.waveCompletedTime && !newGame.victory && !newGame.gameOver) {
     const timeSinceCompleted = newGame.time - newGame.waveCompletedTime;
-    if (timeSinceCompleted >= 30) { // 30 seconds auto-start delay
+    if (timeSinceCompleted >= GAME_CONFIG.WAVE_AUTO_START_DELAY) { // 30 seconds auto-start delay
       newGame = startNextWave(newGame);
     }
   }

@@ -1,6 +1,7 @@
 import { Timer } from 'lucide-react';
 import { useGameState } from '../state/store';
 import { WAVES } from '../engine/types';
+import { GAME_CONFIG } from '../constants';
 
 export function WaveBar() {
   const state = useGameState();
@@ -12,13 +13,13 @@ export function WaveBar() {
   
   const currentWave = WAVES[state.currentWave - 1];
   const waveInProgress = state.mobs.length > 0 || (state.waveStartTime && !state.waveCompleted);
-  const canStartWave = state.waveCompleted && !state.gameOver && state.currentWave < 10;
+  const canStartWave = state.waveCompleted && !state.gameOver && state.currentWave < GAME_CONFIG.TOTAL_WAVES;
 
   // Calculate countdown timer for next wave or current wave progress
   const getWaveProgress = () => {
     if (canStartWave && state.waveCompletedTime) {
       // Show countdown to auto-start next wave (30 seconds)
-      const autoStartDelay = 30; // 30 seconds
+      const autoStartDelay = GAME_CONFIG.WAVE_AUTO_START_DELAY; // 30 seconds
       const timeSinceCompleted = state.time - state.waveCompletedTime;
       const remainingTime = Math.max(0, autoStartDelay - timeSinceCompleted);
       const progress = ((autoStartDelay - remainingTime) / autoStartDelay) * 100;

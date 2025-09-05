@@ -1,10 +1,11 @@
 import { GameGrid, TileType, Vec2 } from './types';
+import { GAME_CONFIG } from '../constants';
 
 
 
 export function createGrid(): GameGrid {
-  const width = 20;
-  const height = 15;
+  const width = GAME_CONFIG.GRID_WIDTH;
+  const height = GAME_CONFIG.GRID_HEIGHT;
   const tiles: TileType[][] = Array(height).fill(null).map(() => Array(width).fill('buildable'));
 
   // Create a path from left to right with some turns

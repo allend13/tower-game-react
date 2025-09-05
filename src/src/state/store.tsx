@@ -2,14 +2,15 @@ import { createContext, useContext, useReducer, useCallback, useRef, useEffect }
 import { GameState, Tower, TowerKind, TOWER_STATS, Vec2 } from '../engine/types';
 import { createGrid } from '../engine/grid';
 import { advanceTick, startNextWave, canAffordTower } from '../engine/sim';
+import { GAME_CONFIG } from '../constants';
 
 // Initial game state
 const createInitialState = (): GameState => ({
   time: 0,
-  money: 500,
-  lives: 20,
-  currentWave: 1,
-  waveCompleted: true, // Start with first wave ready to begin
+  money: GAME_CONFIG.INITIAL_MONEY,
+  lives: GAME_CONFIG.INITIAL_LIVES,
+  currentWave: GAME_CONFIG.INITIAL_WAVE,
+  waveCompleted: false, // First wave is not completed yet
   gameOver: false,
   victory: false,
   paused: false,
@@ -208,10 +209,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     lastTimeRef.current = currentTime;
 
     // Cap delta time to prevent spiral of death
-    const cappedDeltaTime = Math.min(deltaTime, 1/30) * state.speed;
+    const cappedDeltaTime = Math.min(deltaTime, GAME_CONFIG.MAX_DELTA_TIME) * state.speed;
 
     if (cappedDeltaTime > 0) {
-      dispatch({ type: 'TICK', deltaTime: cappedDeltaTime, tileSize: 32 });
+      dispatch({ type: 'TICK', deltaTime: cappedDeltaTime, tileSize: GAME_CONFIG.TILE_SIZE });
     }
 
     animationFrameRef.current = requestAnimationFrame(gameLoop);
