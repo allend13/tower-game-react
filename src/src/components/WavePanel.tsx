@@ -1,5 +1,5 @@
 import { Play, Eye } from 'lucide-react';
-import { useGameState, useGameActions } from '../state/_store';
+import { useGameState, useGameActions } from '../state/zustandStore';
 import { WAVES } from '../engine/types';
 
 export function WavePanel() {

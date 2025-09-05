@@ -1,4 +1,4 @@
-import { useGameState, useGameActions } from '../state/_store';
+import { useGameState, useGameActions } from '../state/zustandStore';
 import { TOWER_STATS, TOWER_ICONS, TowerKind } from '../engine/types';
 import { canAffordTower } from '../engine/sim';
 

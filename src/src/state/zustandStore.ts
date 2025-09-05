@@ -263,3 +263,21 @@ export const useSellTower = () => useGameStore(state => state.sellTower);
 export const useStartNextWave = () => useGameStore(state => state.startNextWave);
 export const useStartGame = () => useGameStore(state => state.startGame);
 export const useRestart = () => useGameStore(state => state.restart);
+
+// Legacy selectors for compatibility with old components
+export const useGameState = () => useGameStore();
+export const useGameActions = () => useGameStore(state => ({
+  pause: state.pause,
+  resume: state.resume,
+  setSpeed: state.setSpeed,
+  selectTile: state.selectTile,
+  startBuilding: state.startBuilding,
+  cancelBuilding: state.cancelBuilding,
+  buildTower: state.buildTower,
+  selectTower: state.selectTower,
+  upgradeTower: state.upgradeTower,
+  sellTower: state.sellTower,
+  startNextWave: state.startNextWave,
+  startGame: state.startGame,
+  restart: state.restart,
+}));
