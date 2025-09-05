@@ -27,27 +27,13 @@ export function WaveBar() {
       return { progress, remainingTime, isCountdown: true };
     }
     
-    if (!waveInProgress || !state.waveStartTime || !currentWave) return null;
+    if (!state.waveStartTime || state.waveCompleted) return null;
     
+    // Show progress of current wave (30 seconds duration)
     const waveTime = state.time - state.waveStartTime;
-    const totalWaveTime = Math.max(...currentWave.entries.map(e => e.delay + (e.count - 1) * e.spacing));
-    
-    // Calculate how many mobs should be spawned by now vs total
-    let totalMobs = 0;
-    let spawnedMobsShouldBe = 0;
-    
-    for (const entry of currentWave.entries) {
-      totalMobs += entry.count;
-      
-      if (waveTime >= entry.delay) {
-        const entryTime = waveTime - entry.delay;
-        const mobsSpawned = Math.min(entry.count, Math.floor(entryTime / entry.spacing) + 1);
-        spawnedMobsShouldBe += Math.max(0, mobsSpawned);
-      }
-    }
-    
-    const progress = totalMobs > 0 ? Math.min((spawnedMobsShouldBe / totalMobs) * 100, 100) : 0;
-    const remainingTime = Math.max(0, totalWaveTime - waveTime);
+    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION; // 30 seconds
+    const remainingTime = Math.max(0, WAVE_DURATION - waveTime);
+    const progress = ((WAVE_DURATION - remainingTime) / WAVE_DURATION) * 100;
     
     return { progress, remainingTime, isCountdown: false };
   };
@@ -57,8 +43,8 @@ export function WaveBar() {
   const getStatusText = () => {
     if (state.victory) return 'Victory!';
     if (state.gameOver && !state.victory) return 'Game Over';
+    if (canStartWave) return 'Waiting for next wave';
     if (waveInProgress) return 'In progress';
-    if (canStartWave) return 'Ready to start';
     return 'Starting...';
   };
 
@@ -86,22 +72,32 @@ export function WaveBar() {
           </div>
 
           {/* Right - Progress bar or timer */}
-          {waveProgress && (
-            <div className="flex items-center gap-2">
-              <div 
-                className="w-20 h-2 bg-muted rounded-full overflow-hidden"
-                title={`${waveProgress.isCountdown ? 'Auto-start countdown' : 'Spawn progress'}: ${waveProgress.remainingTime.toFixed(1)}s ${waveProgress.isCountdown ? 'until auto-start' : 'remaining'}`}
-              >
-                <div 
-                  className={`h-full transition-all duration-500 ease-out ${waveProgress.isCountdown ? 'bg-yellow-500' : 'bg-primary'}`}
-                  style={{ width: `${waveProgress.progress}%` }}
-                />
+          {waveProgress ? (
+            waveProgress.isCountdown ? (
+              // Show text countdown when waiting for next wave
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Next wave in {Math.ceil(waveProgress.remainingTime)}s
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground min-w-[2rem]">
-                {Math.ceil(waveProgress.remainingTime)}s
-              </span>
-            </div>
-          )}
+            ) : (
+              // Show progress bar during wave
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-20 h-2 bg-muted rounded-full overflow-hidden"
+                  title={`Spawn progress: ${waveProgress.remainingTime.toFixed(1)}s remaining`}
+                >
+                  <div 
+                    className="h-full transition-all duration-500 ease-out bg-primary"
+                    style={{ width: `${waveProgress.progress}%` }}
+                  />
+                </div>
+                <span className="text-sm text-muted-foreground min-w-[2rem]">
+                  {Math.ceil(waveProgress.remainingTime)}s
+                </span>
+              </div>
+            )
+          ) : null}
         </div>
 
         {/* Optional: Show current wave reward on mobile when not in progress */}
@@ -127,25 +123,36 @@ export function WaveBar() {
               </span>
             </div>
             
-            {/* Wave progress bar */}
+            {/* Wave progress bar or countdown text */}
             {waveProgress && (
               <>
                 <div className="w-px h-6 bg-border"></div>
-                <div className="flex items-center gap-2">
-                  <Timer className="w-4 h-4 text-muted-foreground" />
-                  <div 
-                    className="w-32 h-2 bg-muted rounded-full overflow-hidden"
-                    title={`${waveProgress.isCountdown ? 'Auto-start countdown' : 'Spawn progress'}: ${waveProgress.remainingTime.toFixed(1)}s ${waveProgress.isCountdown ? 'until auto-start' : 'remaining'}`}
-                  >
-                    <div 
-                      className={`h-full transition-all duration-500 ease-out ${waveProgress.isCountdown ? 'bg-yellow-500' : 'bg-primary'}`}
-                      style={{ width: `${waveProgress.progress}%` }}
-                    />
+                {waveProgress.isCountdown ? (
+                  // Show text countdown when waiting for next wave
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      Next wave in {Math.ceil(waveProgress.remainingTime)}s
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground min-w-[2rem]">
-                    {Math.ceil(waveProgress.remainingTime)}s
-                  </span>
-                </div>
+                ) : (
+                  // Show progress bar during wave
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-4 h-4 text-muted-foreground" />
+                    <div 
+                      className="w-32 h-2 bg-muted rounded-full overflow-hidden"
+                      title={`Spawn progress: ${waveProgress.remainingTime.toFixed(1)}s remaining`}
+                    >
+                      <div 
+                        className="h-full transition-all duration-500 ease-out bg-primary"
+                        style={{ width: `${waveProgress.progress}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground min-w-[2rem]">
+                      {Math.ceil(waveProgress.remainingTime)}s
+                    </span>
+                  </div>
+                )}
               </>
             )}
             
@@ -153,8 +160,6 @@ export function WaveBar() {
               <>
                 <div className="w-px h-6 bg-border"></div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Mobs: {state.mobs.length}</span>
-                  <span>Entries: {currentWave.entries?.length || 0}</span>
                   <span>Reward: ${currentWave.reward || 0}</span>
                 </div>
               </>
