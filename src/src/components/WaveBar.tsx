@@ -10,6 +10,7 @@ export function WaveBar() {
     waveCompleted, 
     gameOver, 
     victory, 
+    paused,
     time, 
     waveStartTime, 
     waveCompletedTime 
@@ -19,6 +20,7 @@ export function WaveBar() {
       waveCompleted: state.waveCompleted,
       gameOver: state.gameOver,
       victory: state.victory,
+      paused: state.paused,
       time: state.time,
       waveStartTime: state.waveStartTime,
       waveCompletedTime: state.waveCompletedTime
@@ -26,8 +28,7 @@ export function WaveBar() {
   );
   
   // Calculate derived state
-  const canStartWave = !waveCompleted && !gameOver && !victory;
-  const waveInProgress = !waveCompleted && !gameOver && !victory;
+  const waveInProgress = !waveCompleted && !gameOver && !victory && waveStartTime !== undefined;
   
   // Add safety checks for undefined state
   if (currentWave === undefined) {
@@ -57,16 +58,16 @@ export function WaveBar() {
   const getStatusText = () => {
     if (victory) return 'Victory!';
     if (gameOver && !victory) return 'Game Over';
-    if (canStartWave) return 'Waiting for next wave';
+    if (paused) return 'Paused';
     if (waveInProgress) return 'In progress';
-    return 'Starting...';
+    return 'Waiting for next wave';
   };
 
   const getStatusColor = () => {
     if (gameOver && !victory) return 'text-red-500';
     if (victory) return 'text-green-400';
+    if (paused) return 'text-yellow-400';
     if (waveInProgress) return 'text-green-400';
-    if (canStartWave) return 'text-green-400';
     return 'text-muted-foreground';
   };
 
