@@ -1,10 +1,10 @@
 import { Timer } from 'lucide-react';
-import { useGameState } from '../state/store';
+import { useGameStateWithTime } from '../state/store';
 import { WAVES } from '../engine/types';
 import { GAME_CONFIG } from '../constants';
 
 export function WaveBar() {
-  const state = useGameState();
+  const state = useGameStateWithTime();
   
   // Add safety checks for undefined state
   if (!state || state.currentWave === undefined) {
@@ -29,9 +29,9 @@ export function WaveBar() {
     
     if (!state.waveStartTime) return null;
     
-    // Show progress of current wave (30 seconds duration)
+    // Show progress of current wave (10 seconds duration)
     const waveTime = state.time - state.waveStartTime;
-    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION; // 30 seconds
+    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION;
     const remainingTime = Math.max(0, WAVE_DURATION - waveTime);
     const progress = ((WAVE_DURATION - remainingTime) / WAVE_DURATION) * 100;
     

@@ -11,8 +11,8 @@ export const GAME_CONFIG = {
   INITIAL_WAVE: 1,
   
   // Wave System
-  WAVE_DURATION: 30, // seconds per wave
-  WAVE_AUTO_START_DELAY: 30, // seconds between waves
+  WAVE_DURATION: 15, // seconds per wave
+  WAVE_AUTO_START_DELAY: 5, // seconds between waves
   TOTAL_WAVES: 10,
   
   // Mob System

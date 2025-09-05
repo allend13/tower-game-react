@@ -288,6 +288,31 @@ export function useGameState() {
   return useGame().state;
 }
 
+// Hook that forces re-render on time changes for UI components
+export function useGameStateWithTime() {
+  const { state } = useGame();
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  
+  useEffect(() => {
+    let animationFrameId: number;
+    
+    const update = () => {
+      forceUpdate();
+      animationFrameId = requestAnimationFrame(update);
+    };
+    
+    animationFrameId = requestAnimationFrame(update);
+    
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, []);
+  
+  return state;
+}
+
 export function useGameActions() {
   const { dispatch } = useGame();
 

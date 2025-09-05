@@ -376,7 +376,7 @@ export function startNextWave(game: GameState): GameState {
     return {
       ...game,
       currentWave: game.currentWave + 1,
-      waveStartTime: undefined,
+      waveStartTime: game.time, // Set wave start time immediately
       waveCompleted: false,
       waveCompletedTime: undefined
     };
