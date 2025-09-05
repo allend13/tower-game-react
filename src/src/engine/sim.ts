@@ -308,9 +308,9 @@ export function advanceTick(game: GameState, deltaTime: number, tileSize: number
   // Check if current wave is complete - simplified logic
   if (newGame.waveStartTime && !newGame.waveCompleted) {
     const waveTime = newGame.time - newGame.waveStartTime;
-    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION; // 30 seconds per wave
+    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION; // 15 seconds per wave
     
-    // Wave is complete after 30 seconds
+    // Wave is complete after 15 seconds
     if (waveTime >= WAVE_DURATION) {
       const wave = WAVES[newGame.currentWave - 1];
       newGame.waveCompleted = true;

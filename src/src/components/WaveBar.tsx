@@ -2,6 +2,7 @@ import { Timer } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '../state/zustandStore';
 import { WAVES } from '../engine/types';
+import { GAME_CONFIG } from '../constants';
 
 export function WaveBar() {
   const { 
@@ -46,7 +47,7 @@ export function WaveBar() {
     if (!waveStartTime) return null;
     
     const waveTime = time - waveStartTime;
-    const WAVE_DURATION = 10; // 10 seconds duration
+    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION; // 15 seconds duration
     const remainingTime = Math.max(0, WAVE_DURATION - waveTime);
     const progress = ((WAVE_DURATION - remainingTime) / WAVE_DURATION) * 100;
     
