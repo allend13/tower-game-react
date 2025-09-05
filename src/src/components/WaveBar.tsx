@@ -27,7 +27,7 @@ export function WaveBar() {
       return { progress, remainingTime, isCountdown: true };
     }
     
-    if (!state.waveStartTime || state.waveCompleted) return null;
+    if (!state.waveStartTime) return null;
     
     // Show progress of current wave (30 seconds duration)
     const waveTime = state.time - state.waveStartTime;
@@ -174,11 +174,6 @@ export function WaveBar() {
               </span>
             )}
             
-            {canStartWave && waveProgress && (
-              <span className="text-sm text-muted-foreground">
-                Auto-starting in {Math.ceil(waveProgress.remainingTime)}s
-              </span>
-            )}
           </div>
         </div>
       </div>

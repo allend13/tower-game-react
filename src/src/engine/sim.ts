@@ -242,6 +242,11 @@ function spawnWave(game: GameState, tileSize: number): GameState {
     return { ...game, victory: true };
   }
 
+  // Don't spawn new mobs if wave is completed
+  if (game.waveCompleted) {
+    return game;
+  }
+
   const wave = WAVES[game.currentWave - 1];
   if (!game.waveStartTime) {
     return { ...game, waveStartTime: game.time };
