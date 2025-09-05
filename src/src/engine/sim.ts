@@ -296,37 +296,21 @@ export function advanceTick(game: GameState, deltaTime: number, tileSize: number
   if (game.paused || game.gameOver || !game.gameStarted) return game;
 
   let newGame = { ...game, time: game.time + deltaTime };
+  console.log('Advancing tick', {
+    newGame,
+  });
 
-  // Check if current wave is complete
-  if (newGame.waveStartTime
-     && !newGame.waveCompleted) {
-    const wave = WAVES[newGame.currentWave - 1];
+  // Check if current wave is complete - simplified logic
+  if (newGame.waveStartTime && !newGame.waveCompleted) {
     const waveTime = newGame.time - newGame.waveStartTime;
-    const totalWaveTime = Math.max(...wave.entries.map(e => e.delay + (e.count - 1) * e.spacing));
+    const WAVE_DURATION = GAME_CONFIG.WAVE_DURATION; // 30 seconds per wave
     
-    // Calculate total mobs that should have spawned by now
-    let totalMobsShouldSpawn = 0;
-    let actualMobsSpawned = 0;
-    
-    for (const entry of wave.entries) {
-      totalMobsShouldSpawn += entry.count;
-      if (waveTime >= entry.delay) {
-        const entryTime = waveTime - entry.delay;
-        const mobsSpawned = Math.min(entry.count, Math.floor(entryTime / entry.spacing) + 1);
-        actualMobsSpawned += Math.max(0, mobsSpawned);
-      }
-    }
-    
-    // Wave is complete when:
-    // 1. All mobs that should spawn have spawned (waveTime > totalWaveTime)
-    // 2. No mobs remain on the field
-    const allMobsSpawned = waveTime > totalWaveTime;
-    const noMobsRemaining = newGame.mobs.length === 0;
-    
-    if (allMobsSpawned && noMobsRemaining) {
+    // Wave is complete after 30 seconds
+    if (waveTime >= WAVE_DURATION) {
+      const wave = WAVES[newGame.currentWave - 1];
       newGame.waveCompleted = true;
       newGame.money += wave.reward;
-      newGame.waveCompletedTime = newGame.time; // Track when wave was completed
+      newGame.waveCompletedTime = newGame.time;
       
       if (newGame.currentWave >= WAVES.length) {
         newGame.victory = true;
@@ -338,7 +322,7 @@ export function advanceTick(game: GameState, deltaTime: number, tileSize: number
   // Auto-start next wave after 30 seconds
   if (newGame.waveCompleted && newGame.waveCompletedTime && !newGame.victory && !newGame.gameOver) {
     const timeSinceCompleted = newGame.time - newGame.waveCompletedTime;
-    if (timeSinceCompleted >= GAME_CONFIG.WAVE_AUTO_START_DELAY) { // 30 seconds auto-start delay
+    if (timeSinceCompleted >= GAME_CONFIG.WAVE_AUTO_START_DELAY) {
       newGame = startNextWave(newGame);
     }
   }
