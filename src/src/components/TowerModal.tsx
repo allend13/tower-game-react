@@ -76,8 +76,8 @@ export function TowerModal() {
   // Calculate tower screen position (32px tile size from canvas renderer)
   const tileSize = 32;
   const worldPos = gridToWorld(selectedTower.tile, tileSize);
-  const towerScreenX = canvasPosition.x + worldPos.x + tileSize; // 1 tile to the right
-  const towerScreenY = canvasPosition.y + worldPos.y - tileSize; // 1 tile above
+  const towerScreenX = canvasPosition.x + worldPos.x + tileSize*2.5; // 1 tile to the right
+  const towerScreenY = canvasPosition.y + worldPos.y - tileSize*5.5; // 1 tile above
 
   return (
     <div 
