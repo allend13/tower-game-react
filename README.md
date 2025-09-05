@@ -1,11 +1,9 @@
 
-  # Tower Defense Game Design - ACTUAL
-
-  This is a code bundle for Tower Defense Game Design - ACTUAL. The original project is available at https://www.figma.com/design/70MkCGNsL9oSmX49RKvxJV/Tower-Defense-Game-Design---ACTUAL.
+  # Tower Defense Game
 
   ## Running the code
 
-  Run `npm i` to install the dependencies.
+  Run `yarn add` to install the dependencies.
 
-  Run `npm run dev` to start the development server.
+  Run `yarn start` to start the development server.
   
