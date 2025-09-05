@@ -11,6 +11,7 @@ export function WaveBar() {
     return null;
   }
   
+  
   const currentWave = WAVES[state.currentWave - 1];
   const waveInProgress = state.mobs.length > 0 || (state.waveStartTime && !state.waveCompleted);
   const canStartWave = state.waveCompleted && !state.gameOver && state.currentWave < GAME_CONFIG.TOTAL_WAVES;
